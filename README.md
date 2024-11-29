@@ -28,9 +28,12 @@ A projekt lokálisan futtatható, felállítottam egy poetry környezetet, hogy 
 poetry install
 ```
 
+
 ## API lehívás
 
-A feladat során IBM HR adatait használom. Ezt a [kaggle](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset/data)-ről töltöm le a saját API-jukkal. Ennek feltétele, hogy saját kaggle fiókunk legyen. Biztonság miatt arra kérnélek, hogy csinálj Te is egy kaggle felhasználót majd a jöbb felső sarokban a profil képre kattintva étmegyünk a Settings részre, ahol az API-nál csinálhatunk access tokent. Amennyiben ezt nem szívesen csinálod meg, e-mailben mellékelem az én access tokenemet.
+A feladat során IBM HR adatait használom. Ezt a [kaggle](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset/data)-ről töltöm le a saját API-jukkal. Azért ezt választottam, mert a munkavállalók megtartása kiemelten fontos a cégek számára, mert új alkalmazottakat be kell tanítani, sokszor olyan infrastruktúrában kell dolgozniuk, amit nem ismernek, így sokkal nagyob kockázatot jelentenek. Emiatt úgy gondoltam, hogy érdemes megvizsgálni azt, hogy melyek azok a válzotók, amelyekk leginkább hozzájárulnak a 
+
+ Ennek feltétele, hogy saját kaggle fiókunk legyen. Biztonság miatt arra kérnélek, hogy csinálj Te is egy kaggle felhasználót majd a jöbb felső sarokban a profil képre kattintva étmegyünk a Settings részre, ahol az API-nál csinálhatunk access tokent. Amennyiben ezt nem szívesen csinálod meg, e-mailben mellékelem az én access tokenemet.
 
 A letöltött .json file-t kérlek ide másold: C:\Users\<Your Username>\.kaggle\
 Feltéve hogy windowsod van.
@@ -78,16 +81,22 @@ https://www.dbvis.com/thetable/how-to-set-up-postgres-using-docker/
 Két fontos mozzanata van: feltöltés (data_request.py-ben) az upload_to_db és pull_table.
 
 
-## Exploratory Data Analysis
+## Adatfeldolgozás
 
 
-## Binary Classification
 
-sklearn, pandas
-Decision tree / xgboost...
-Akár valami klaszterelés
 
-## FastAPI + Streamlit
+
+## Frontend
+
+Streamlit-et választottam mert egyszerű dashboardot készíteni vele. Technikailag jobb lenne ha építenék egy FastAPI backendet modelltanításra, mlflow-t MLOPS-ra és VC-ra, de az nem fér bele az allokált időbe. 
+
+
+```commandline
+streamlit run frontend.py
+```
+
+
 
 
 ## Docker??
