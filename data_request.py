@@ -3,6 +3,9 @@ from os import listdir,getcwd
 import zipfile
 import pandas as pd
 import kaggle
+from sqlalchemy import create_engine, text
+import psycopg2 
+
 
 def pull_kaggle_data(name : str) -> None:
     """Downloads kaggle dataset (uses kaggle.api)
@@ -26,19 +29,40 @@ def read_kaggle_data(loc : str) -> dict:
             data[dir.removesuffix(".csv")] = pd.read_csv(os.path.join(loc, dir))
             
     return data
+
+
+
+
 ## Test
 if __name__ == "__main__":
-    ## create a decorator
-    ## create temp...
+    ##TODO: create a decorator
+    
     loc = os.path.join(getcwd(), "temp") 
-    pull_kaggle_data("pavansubhasht/ibm-hr-analytics-attrition-dataset")
+    #pull_kaggle_data("pavansubhasht/ibm-hr-analytics-attrition-dataset")
     unzip_kaggle_data(loc) 
     data = read_kaggle_data(loc)
   
-    ##send to postgres
+    ##connect to postgres
+    dbname = "postgres"
+    user = "postgres"
+    host = "localhost"
+    port ="5432"
+    password = "mysecretpassword" # mysecretpassword
+    engine = create_engine(f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}') 
+    
+ 
+    for k in data:
+        name = k.replace("-", "_").lower()
+        data[k].to_sql(name=name, con = engine, if_exists ="replace")
+ 
+    ## Query data
+    
+    with engine.connect() as connection:
+        for k in data:
+            name = k.replace("-", "_").lower()
+            print(connection.execute(text(f'SELECT * FROM public."{name}"')).fetchall())
     
     ##close connection, and delete temp
-                
     print("Debug!")     
     
     ## delete temp, use it as a decorator...

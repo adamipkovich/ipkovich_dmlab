@@ -16,6 +16,7 @@ psycopg2 = "^2.9.10"
 pandas = "^2.2.3"
 kaggle = "^1.6.17"
 kagglehub = "^0.3.4"
+sqlalchemy = "^2.0.36"
 
 
 [build-system]

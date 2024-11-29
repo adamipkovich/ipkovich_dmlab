@@ -68,6 +68,9 @@ Futtassuk a postgres containert:
 docker run --name hr_data -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 -v postgres_data:/var/lib/postgresql/data postgres
 ```
 
+Ebben a példában az alap adatbázist használjuk bármiféle "security" nélkül. 
+
+
 Ha minden jól ment, akkor a DockerHubon a következőt látod:
 ![alt text](assets/docker_hub.png)
 
