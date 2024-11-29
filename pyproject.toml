@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "ipkovich-dmlab"
+version = "0.1.0"
+description = "Próbafeladat a dmlab éltal meghírdetett szoftverfejlesztő pozíciójára."
+authors = ["Adam Ipkovich <71510025+adamipkovich@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+streamlit = "^1.40.2"
+fastapi = "^0.115.5"
+requests = "^2.32.3"
+psycopg2 = "^2.9.10"
+pandas = "^2.2.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
