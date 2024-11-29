@@ -30,22 +30,30 @@ poetry install
 
 ## API lehívás
 
-A feladat során IBM HR adatait használom. Ezt a (kaggle)[https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset/data]-ről töltöm le a saját API-jukkal. Ennek feltétele, hogy saját kaggle fiókunk legyen. Biztonság miatt arra kérnélek, hogy csinálj Te is egy kaggle felhasználót majd a jöbb felső sarokban a profil képre kattintva étmegyünk a Settings részre, ahol az API-nál csinálhatunk access tokent.
-
-Valahogy így néz ki:
-![alt text](iassets/kaggle.png)
+A feladat során IBM HR adatait használom. Ezt a [kaggle](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset/data)-ről töltöm le a saját API-jukkal. Ennek feltétele, hogy saját kaggle fiókunk legyen. Biztonság miatt arra kérnélek, hogy csinálj Te is egy kaggle felhasználót majd a jöbb felső sarokban a profil képre kattintva étmegyünk a Settings részre, ahol az API-nál csinálhatunk access tokent. Amennyiben ezt nem szívesen csinálod meg, e-mailben mellékelem az én access tokenemet.
 
 A letöltött .json file-t kérlek ide másold: C:\Users\<Your Username>\.kaggle\
-Amennyiben ezt nem szívesen csinálod meg, e-mailben mellékelem az én access tokenemet.
+Feltéve hogy windowsod van.
 
+Valahogy így néz ki:
+![alt text](assets/kaggle.png)
+
+Van egy nagyon jó magyarázat hogyan lehet kaggle-ről adatsorokat letölteni, ezt [itt](https://medium.com/@vinaychavda.de/a-guide-to-extracting-data-from-kaggle-for-your-data-science-projects-e15ef8ffc054) találod.
 
 
 IBM HR data 
-https://medium.com/@vinaychavda.de/a-guide-to-extracting-data-from-kaggle-for-your-data-science-projects-e15ef8ffc054
 
+
+
+A *data_request.py* fileban egy teszt található, aminél letölti a rendszer egy temp mappába egy beadott kaggle adatbázist (akár több .csv-vel rendelkező), majd beolvassa a kicsomagolt csv-ket a memóriába.
 
 
 ## Adattárolás
+
+A feladat kifejezetten kéri a microservice architektúrát, ezért postgresql-t használok docker hubbal.
+
+Ennek futtatásához szükség van a Docker-re és a (dockerhub)[https://hub.docker.com/]ra.
+
 
 -> postgres sql
 
