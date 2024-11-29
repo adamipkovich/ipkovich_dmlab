@@ -3,7 +3,7 @@ from os import listdir,getcwd
 import zipfile
 import pandas as pd
 import kaggle
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, Engine, inspect
 import psycopg2 
 
 
@@ -26,12 +26,34 @@ def read_kaggle_data(loc : str) -> dict:
     data = dict()
     for dir in listdir(loc): # I do this with consideration to multiple csv files in one zip
         if dir.endswith(".csv"): ## All .csv to memory
-            data[dir.removesuffix(".csv")] = pd.read_csv(os.path.join(loc, dir))
+            name = dir.removesuffix(".csv").replace("-", "_").lower()
+            data[name] = pd.read_csv(os.path.join(loc, dir))
             
     return data
 
+def create_postgres_engine(dbname = "postgres",
+    user = "postgres",
+    host = "localhost",
+    port ="5432",
+    password = "mysecretpassword"):
+    """Creates a sqlalchemy engine object for postgresql DB use."""    
+    return create_engine(f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}') 
 
+def upload_datasets_to_db(data : dict[str, pd.DataFrame], engine : Engine) -> None:
+    """Uses pandas .to_sql function to create/replace a table for a dataset in the data registry."""
+    for k in data:
+        data[k].to_sql(name=k, con = engine, if_exists ="replace")
 
+def pull_data(engine : Engine):
+    data = dict()
+    with engine.connect() as connection:
+        ##get all table
+        inspector = inspect(engine)
+        for k in inspector.get_table_names():
+            data[k] = pd.read_sql(f'SELECT * FROM public."{k}"', con=connection)
+            data[k].set_index("index", inplace=True)
+            #connection.execute(text(f'SELECT * FROM public."{k}"')).fetchall()
+    return data
 
 ## Test
 if __name__ == "__main__":
@@ -40,27 +62,16 @@ if __name__ == "__main__":
     loc = os.path.join(getcwd(), "temp") 
     #pull_kaggle_data("pavansubhasht/ibm-hr-analytics-attrition-dataset")
     unzip_kaggle_data(loc) 
-    data = read_kaggle_data(loc)
-  
-    ##connect to postgres
-    dbname = "postgres"
-    user = "postgres"
-    host = "localhost"
-    port ="5432"
-    password = "mysecretpassword" # mysecretpassword
-    engine = create_engine(f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}') 
-    
- 
-    for k in data:
-        name = k.replace("-", "_").lower()
-        data[k].to_sql(name=name, con = engine, if_exists ="replace")
+    data = read_kaggle_data(loc) # read in csv file
+    engine = create_postgres_engine() #create engine
+    upload_datasets_to_db(data, engine=engine)
+    qdata = pull_data(engine)
+    print(qdata)
+
  
     ## Query data
     
-    with engine.connect() as connection:
-        for k in data:
-            name = k.replace("-", "_").lower()
-            print(connection.execute(text(f'SELECT * FROM public."{name}"')).fetchall())
+
     
     ##close connection, and delete temp
     print("Debug!")     

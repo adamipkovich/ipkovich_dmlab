@@ -43,14 +43,13 @@ Van egy nagyon jó magyarázat hogyan lehet kaggle-ről adatsorokat letölteni, 
 
 IBM HR data 
 
-A *data_request.py* fileban egy teszt található, aminél letölti a rendszer egy temp mappába egy beadott kaggle adatbázist (akár több .csv-vel rendelkező), majd beolvassa a kicsomagolt csv-ket a memóriába.
-
+A *data_request.py* fileban egy teszt található, aminél letölti a rendszer egy temp mappába egy beadott kaggle adatbázist (akár több .csv-vel rendelkező), majd beolvassa a kicsomagolt csv-ket a memóriába. Ezután ezt elmenti az adatbázisba, majd teszteli, hogy lekérhető-e az adat.
 
 ## Adattárolás
 
-A feladat kifejezetten kéri a microservice architektúrát, ezért postgresql-t használok docker hubbal.
+A feladat kifejezetten kéri a microservice architektúrát, ezért postgresql-t használok Docker Hubbal.
 
-Ennek futtatásához szükség van a Docker-re és a [dockerhub](https://hub.docker.com/)-ra. Az első lépés, hogy lehúzzuk a postgresql DB-jét a Dockerhubról!
+Ennek futtatásához szükség van a Docker-re és a [dockerhub](https://hub.docker.com/)-ra. Az első lépés, hogy lehúzzuk a postgresql DB-jét a Docker Hubról!
 Írjuk a terminálba, hogy:
 ```commandline
 docker pull postgres
@@ -67,19 +66,17 @@ Futtassuk a postgres containert:
 ```commandline
 docker run --name hr_data -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 -v postgres_data:/var/lib/postgresql/data postgres
 ```
-
 Ebben a példában az alap adatbázist használjuk bármiféle "security" nélkül. 
-
 
 Ha minden jól ment, akkor a DockerHubon a következőt látod:
 ![alt text](assets/docker_hub.png)
 
 
-
-
-
+Én pgadmint használok a fejlesztés során, megtalálhatod [itt](https://www.pgadmin.org/). Ezzel monitorozhatod a postgresql adatbázist.
 https://www.dbvis.com/thetable/how-to-set-up-postgres-using-docker/
-pg_admin
+
+Két fontos mozzanata van: feltöltés (data_request.py-ben) az upload_to_db és pull_table.
+
 
 ## Exploratory Data Analysis
 
