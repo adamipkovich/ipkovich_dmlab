@@ -21,6 +21,9 @@ Dokumentálás. Kérünk, hogy a munkád alapszinten dokumentáld. Néhány szó
 # Megoldás
 
 ## Setup
+Fontos megjegyzés: a kódban mindenhol angolul kommentelek, kivéve a readme-ben. Ez csak megszokás.
+
+A githubon a main branchen található a működő kód. Ezt kérlek egy git clone-nal húzd le.
 
 A projekt lokálisan futtatható, felállítottam egy poetry környezetet, hogy könnyen telepíthető legyen az összes csomag. Ez azért is fontos, hogy Ti is ugyanolyan verziójú csomagokat használjatok.
 
@@ -50,15 +53,15 @@ A *data_request.py* fileban egy teszt található, aminél letölti a rendszer e
 
 ## Adattárolás
 
-A feladat kifejezetten kéri a microservice architektúrát, ezért postgresql-t használok Docker Hubbal.
+A feladat kifejezetten kéri a microservice architektúrát, ezért postgresql-t használok Dockerrel.
 
-Ennek futtatásához szükség van a Docker-re és a [dockerhub](https://hub.docker.com/)-ra. Az első lépés, hogy lehúzzuk a postgresql DB-jét a Docker Hubról!
+Ennek futtatásához szükség van a [Docker](https://hub.docker.com/)-re. Az első lépés, hogy lehúzzuk a postgresql DB-jét a Docker Hubról!
 Írjuk a terminálba, hogy:
 ```commandline
 docker pull postgres
 ```
 
-Létre kell hozni egy Docker volume-ot, hogy meg tudjuk tartani az adatsort (ez akkor lenne fontos, ha konstans adatok érkeznek).
+Létrehozunk egy Docker volume-ot, hogy meg tudjuk tartani az adatsort leállítás után is (ez akkor lenne fontos, ha konstans adatok érkeznek).
 
 ```commandline
 docker volume create postgres_data
@@ -80,14 +83,28 @@ https://www.dbvis.com/thetable/how-to-set-up-postgres-using-docker/
 
 Két fontos mozzanata van: feltöltés (data_request.py-ben) az upload_to_db és pull_table.
 
+A rendszer képes kezelni, ha esetleg több csv fájlt csomagolna le a kaggle. Jelen esetben ez 1.
 
 ## Modelling
 
-...
+A feladat egyszerű - szeretném megvizsgálni azt, hogy egyes munkavállalóknál mi az ami hozzátehet a kiégéshez/lemorzsolódáshoz (ami egy bináris label). Ezért a draft_data_processing.ipynb-ban csináltam egy gyors xgboost klasszifikációs modelt, majd ennek a SHAP elemzését. Így individuálisan magyarázhotó, kinél mi volt a MODEL!!! szerint lehetséges kiégést okozó faktor. Természetesen ez nem kauzalítás, és a modell vehet alapul olyan feltételezéseket, amelyek hamisak. Ezért mindig fontos tesztelni a kauzalítást, és kísérlettervezéssel célratörően megvizsgálni, hogy vajon tényleg ilyen mértékben befolyásolhatták-e a munkavállalókat a faktorok.
 
-jupyter elmagyarázza a lépéseket.
+_______
 
-modelling.py -ben benne vannak a lépések
+A kategórikus változókat jóllehet nem dolgoztam fel teljesen, ezt tovább lehetne bonyolítani sklearn.preprocessing.LabelEncoder-rel. Az idő miatt ezt nem tettem meg, ez az analízisben a summary-ben szürke színként jelen majd meg.
+
+Készítek egy korrelációs táblát, számos numerikus változó korrelál egymással. Confounding faktorok lehetnek az analízis során, de ez most nem lényeges.
+
+GridSearch-csel készítek egy xgboost modelt. Azért válaszottam ezt a modelt mert:
+- Gyors (párhuzamosítva és optimálva van, jól kezeli a tabuláris, nagy adattáblákat)
+- Gyakran jobb eredményt ad mint egy szimpla random forest, vagy alap módszer
+- Interpretabilítás nem lényeg (SHAP miatt)
+
+Accuracy alapján tanítom a modellt, mert itt minden érték eltalálása számít.
+
+Az analízis a SHAP módszeren alapul ami alapvetően a model interpretability problémájának megoldására lett kifejlesztve.  A SHAP kiszámolja az egyéni hozzáadott értékeket, és az értékek szummája a várható értéktől való eltérés. Ez egy kipróbált módszer és nagyon jó arra hogy megvizsgáljuk a modellünk miért döntött úgy ahogy. A shapley értékek tulajdonképpen alkalmazhatóak arra hogy munkavállaloknál egyes faktorok mennyire játszanak bele valakinek a lemorzsolódásába, de természetesen kiemelendő, hogy a modell szerint. Az ábrák könnyen értelmezhetőek szakértők számára, egy kis leírással pedig akár bárki értelmezheti őket.
+
+modelling.py -ben függvényekké alakítottam a fontosabb lépéseket, hogy ne kelljen a frontend fejlesztéssnél újraírni.
 
 
 ## Frontend
@@ -114,12 +131,4 @@ Ahol négy interaktálható elem van:
 - Employee number __selectbox__ : Csak a minták vizsgálatánák releváns. ID alapján kiválasztunk egy munkavállalót, és őt magyarázzuk.
 
 Az ábrákat cache-elem, tehát nem kell egynél többször regenerálni, szintúgy a Shapley értékeket. A gombok funckionalítása is cachelve van, mert jelenleg nem változik a kaggle-n az adatsor. Természetesen ezt egy valós idejű rendszernél máshogy oldanám meg.
-
-
-
-
-
-
-## Docker??
-
 
