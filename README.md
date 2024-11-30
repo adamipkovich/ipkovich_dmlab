@@ -23,6 +23,8 @@ Dokumentálás. Kérünk, hogy a munkád alapszinten dokumentáld. Néhány szó
 ## Setup
 Fontos megjegyzés: a kódban mindenhol angolul kommentelek, kivéve a readme-ben. Ez csak megszokás.
 
+Python 3.12-őt használok.
+
 A githubon a main branchen található a működő kód. Ezt kérlek egy git clone-nal húzd le.
 
 A projekt lokálisan futtatható, felállítottam egy poetry környezetet, hogy könnyen telepíthető legyen az összes csomag. Ez azért is fontos, hogy Ti is ugyanolyan verziójú csomagokat használjatok.
