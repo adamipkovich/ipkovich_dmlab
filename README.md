@@ -92,18 +92,33 @@ modelling.py -ben benne vannak a lépések
 
 ## Frontend
 
-Streamlit-et választottam mert egyszerű dashboardot készíteni vele. Technikailag jobb lenne ha építenék egy FastAPI backendet modelltanításra, mlflow-t MLOPS-ra és VC-ra, de az nem fér bele az allokált időbe. 
+Streamlit-et választottam mert egyszerű dashboardot készíteni vele. Technikailag jobb lenne ha építenék egy FastAPI backendet modelltanításra, mlflow-t MLOPS-ra és VC-ra, de az nem fér bele az allokált időbe. Korrelációs mátrixot a draftban vizsgálok, de a dashboardba nem került bele.
 
--> pull data on startup
--> modelling.py -vel készítem a modellt az elején cache-ve
--> ábrákat helyben elkészítjük (cache-lve), lementjük a shap-ot
-
-voila.
-
+Létrehoztam egy modelling.py-t, ami tartalmazza a releváns funkciókat a draftból. Ezt és a data_request.py-t használom a streamlitben.
 
 ```commandline
 streamlit run frontend.py
 ```
+
+
+Végeredmény:
+![alt text](dashboard.png)
+
+
+Ahol négy interaktálható elem van:
+- Pull Data from kaggle __gomb__ : Letölti az adatsort a kaggle-ről, feltölti a DB-be, lehúzza az adatot a DB-ről (showcase jelleggel), és elkészíti a Shapley értéket
+- Explain data! __gomb__ : A felső gomb funkcionalítása, de nem tölti le az adatsort. Ez akkor jó ha újraindítom az alkalmazást, de az adat még benn van a DB-ben.
+
+- Figure type __selectbox__ : Ez két fajta ábrázolást mutat - Summary, ami az egész adatbázist magyarázza, és az Individual-t ami pedig a munkavállalokat (mintákat) magyarázza.
+
+- Employee number __selectbox__ : Csak a minták vizsgálatánák releváns. ID alapján kiválasztunk egy munkavállalót, és őt magyarázzuk.
+
+Az ábrákat cache-elem, tehát nem kell egynél többször regenerálni, szintúgy a Shapley értékeket. A gombok funckionalítása is cachelve van, mert jelenleg nem változik a kaggle-n az adatsor. Természetesen ezt egy valós idejű rendszernél máshogy oldanám meg.
+
+
+
+
+
 
 ## Docker??
 

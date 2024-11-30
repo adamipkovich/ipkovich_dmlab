@@ -44,7 +44,7 @@ def upload_datasets_to_db(data : dict[str, pd.DataFrame], engine : Engine) -> No
     for k in data:
         data[k].to_sql(name=k, con = engine, if_exists ="replace")
 
-def pull_data(engine : Engine):
+def pull_data(engine : Engine, table_name : str = None) -> dict:
     data = dict()
     with engine.connect() as connection:
         ##get all table
@@ -58,7 +58,6 @@ def pull_data(engine : Engine):
 ## Test
 if __name__ == "__main__":
     ##TODO: create a decorator
-    
     loc = os.path.join(getcwd(), "temp") 
     #pull_kaggle_data("pavansubhasht/ibm-hr-analytics-attrition-dataset")
     unzip_kaggle_data(loc) 
@@ -67,13 +66,3 @@ if __name__ == "__main__":
     upload_datasets_to_db(data, engine=engine)
     qdata = pull_data(engine)
     print(qdata)
-
- 
-    ## Query data
-    
-
-    
-    ##close connection, and delete temp
-    print("Debug!")     
-    
-    ## delete temp, use it as a decorator...
