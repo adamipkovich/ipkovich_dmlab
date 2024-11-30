@@ -43,6 +43,10 @@ A feladat során IBM HR adatait használom. Ezt a [kaggle](https://www.kaggle.co
 A letöltött .json file-t kérlek ide másold: C:\Users\<Your Username>\.kaggle\
 Feltéve hogy windowsod van.
 
+Linux/UNIX/OSX:
+~/.kaggle/kaggle.json
+
+
 Valahogy így néz ki:
 ![alt text](assets/kaggle.png)
 
