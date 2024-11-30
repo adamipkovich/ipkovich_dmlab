@@ -119,7 +119,7 @@ streamlit run frontend.py
 
 
 Végeredmény:
-![alt text](dashboard.png)
+![alt text](assets/dashboard.png)
 
 
 Ahol négy interaktálható elem van:
