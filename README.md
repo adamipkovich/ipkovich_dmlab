@@ -81,23 +81,29 @@ https://www.dbvis.com/thetable/how-to-set-up-postgres-using-docker/
 Két fontos mozzanata van: feltöltés (data_request.py-ben) az upload_to_db és pull_table.
 
 
-## Adatfeldolgozás
+## Modelling
 
+...
 
+jupyter elmagyarázza a lépéseket.
 
+modelling.py -ben benne vannak a lépések
 
 
 ## Frontend
 
 Streamlit-et választottam mert egyszerű dashboardot készíteni vele. Technikailag jobb lenne ha építenék egy FastAPI backendet modelltanításra, mlflow-t MLOPS-ra és VC-ra, de az nem fér bele az allokált időbe. 
 
+-> pull data on startup
+-> modelling.py -vel készítem a modellt az elején cache-ve
+-> ábrákat helyben elkészítjük (cache-lve), lementjük a shap-ot
+
+voila.
+
 
 ```commandline
 streamlit run frontend.py
 ```
-
-
-
 
 ## Docker??
 
