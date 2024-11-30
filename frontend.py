@@ -1,24 +1,28 @@
 """This frontend was made specifically for IBM HR data."""
 import os
-
 import streamlit as st
 import pandas as pd
 import shap
 import matplotlib.pyplot as plt
-from data_request import create_postgres_engine, pull_data, unzip_kaggle_data, read_kaggle_data, upload_datasets_to_db
+from data_request import create_postgres_engine, pull_data, pull_kaggle_data, unzip_kaggle_data, read_kaggle_data, upload_datasets_to_db
 from modelling import preprocess_hr_data, create_classification_model_xgboost, check_model, calculate_shap_values
 
 
+# init global variable for explainer
 if 'explainer' not in st.session_state:
     st.session_state['explainer'] = None
 
+# init global variable for explainer
 if 'data' not in st.session_state:
     st.session_state['data'] = None
 
+
+## get data from kaggle - 
 def api_call():
+    """Pull data from kaggle, unzip it, send it to the DB."""
     loc = os.path.join(os.getcwd(), "temp") 
-    #pull_kaggle_data("pavansubhasht/ibm-hr-analytics-attrition-dataset")
     try:
+        pull_kaggle_data("pavansubhasht/ibm-hr-analytics-attrition-dataset")
         unzip_kaggle_data(loc) 
         data = read_kaggle_data(loc) # read in csv file
         engine = create_postgres_engine() #create engine
@@ -27,25 +31,32 @@ def api_call():
     except:
         return False
 
+# cache data because the API call is not runtime - meaning pull only happens once
 @st.cache_data
 def pull_data_from_db():
-    """On startup, we download the dataset."""
+    """Download the data from the DB"""
     engine = create_postgres_engine()
     df = pull_data(engine)
     X_train, X_test, y_train, y_test = preprocess_hr_data(df["wa_fn_usec__hr_employee_attrition"])
     return X_train, X_test, y_train, y_test
 
+## Cache so that it does not have to retrain model each render cycle
 @st.cache_resource
 def create_explainer(X_train, X_test, y_train, y_test):
+    """Create shap explainer so that we can analyze individual contributions of factors to Employee Attrition."""
     model = create_classification_model_xgboost(X_train, y_train)
     assert check_model(model,X_test, y_test) is True
     return calculate_shap_values(model, pd.concat((X_train, X_test), axis = "index"))
 
 
 
+##Generate figure - only create figures once.
 @st.cache_resource
 def create_fig(_explainer, X, mode = "Summary", id = 0):
+    """Creates figures for the frontend to showcase to the decision maker. Mode and id should not be exposed to a user, and should be handled dynamically inside the frontend.
     
+    
+    """
     if _explainer is None or X is None:
         return plt.figure(), ""
     
@@ -69,6 +80,8 @@ def create_fig(_explainer, X, mode = "Summary", id = 0):
     
     return plt.figure(), ""
     
+
+#%% Frontend features
 
 with st.sidebar:
     st.title("Welcome to Employee attrition evaluation Dashboard!")

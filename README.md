@@ -130,5 +130,6 @@ Ahol négy interaktálható elem van:
 
 - Employee number __selectbox__ : Csak a minták vizsgálatánák releváns. ID alapján kiválasztunk egy munkavállalót, és őt magyarázzuk.
 
-Az ábrákat cache-elem, tehát nem kell egynél többször regenerálni, szintúgy a Shapley értékeket. A gombok funckionalítása is cachelve van, mert jelenleg nem változik a kaggle-n az adatsor. Természetesen ezt egy valós idejű rendszernél máshogy oldanám meg.
+Az ábrákat cache-elem, tehát nem kell egynél többször regenerálni, szintúgy a Shapley értékeket. A gombok funckionalítása is cachelve van, mert jelenleg nem változik a kaggle-n az adatsor. Természetesen ezt egy valós idejű rendszernél máshogy oldanám meg. Nem cache-lném ha külön microserviceben futtatnám és feltölteném a DB-be, majd onnan lekérném. Természetesen a modelt is el lehet menteni MLflow segítségével.
 
+Elnézést kérek, hogy lassú a frontend, gyorsan oldottam meg a feladatot, és a microservice architektúra neméppen a legoptimálisabb egy ilyen "kicsi" feladat megoldásához.
