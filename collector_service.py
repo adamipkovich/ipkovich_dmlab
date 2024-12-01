@@ -6,8 +6,8 @@ from data_request import pull_kaggle_data, read_kaggle_data, create_postgres_eng
 engine = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Load the ML model
-    ## set global variables
+    """Connect to the DB on startup."""
+    ## get global variables -> Docker may be used to define credentials
     dbname = os.environ["DBNAME"]
     user = os.environ["DBUSER"]
     host = os.environ["DBHOST"]
@@ -22,10 +22,12 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def landing():
+    """API to check which service is opened on this port."""
     return "Welcome to the kaggle collector service!"
 
 @app.post("/connect")
 def connect_to_db(request : Request):
+    """Use if you could not join to the DB on runtime"""
     global engine
     req = dict(request.query_params)
     dbname = req.get("dbname")
@@ -37,6 +39,7 @@ def connect_to_db(request : Request):
     
 @app.post("/pull")
 def get_kaggle_dataset(request : Request):  
+    """Pull data from kaggle and upload to DB - request need a 'name' value that is the name of the prpject that needs to be pulled."""
     global engine ## Errors from
     loc = os.path.join(os.getcwd(), "temp")   
     req = dict(request.query_params)
@@ -48,7 +51,7 @@ def get_kaggle_dataset(request : Request):
 
 
 if __name__ == "__main__":
-    ## Test service with uvicorn
+    ## Run service with uvicorn
     os.environ["DBNAME"] = "postgres"
     os.environ["DBUSER"] = "postgres"
     os.environ["DBHOST"] = "localhost"
