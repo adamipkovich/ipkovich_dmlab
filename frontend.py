@@ -1,8 +1,10 @@
 """This frontend was made specifically for IBM HR data."""
 import os
+import pickle
 import streamlit as st
 import pandas as pd
 import shap
+import requests
 import matplotlib.pyplot as plt
 from data_request import create_postgres_engine, pull_data, pull_kaggle_data, unzip_kaggle_data, read_kaggle_data, upload_datasets_to_db
 from modelling import preprocess_hr_data, create_classification_model_xgboost, check_model, calculate_shap_values
@@ -12,51 +14,33 @@ from modelling import preprocess_hr_data, create_classification_model_xgboost, c
 if 'explainer' not in st.session_state:
     st.session_state['explainer'] = None
 
-# init global variable for explainer
-if 'data' not in st.session_state:
-    st.session_state['data'] = None
+# do not cache! -> this is a command!
+def api_call(url = "http://localhost:8015", kaggle_project = "pavansubhasht/ibm-hr-analytics-attrition-dataset"):
+    """Ask the collector service to pull data from kaggle."""
+    req_data = dict()
+    req_data["name"] = kaggle_project
+    response = requests.post(url=url + "/pull", data=req_data)
+    return response.status_code == 200
 
-
-## get data from kaggle - 
-def api_call():
-    """Pull data from kaggle, unzip it, send it to the DB."""
-    loc = os.path.join(os.getcwd(), "temp") 
-    try:
-        pull_kaggle_data("pavansubhasht/ibm-hr-analytics-attrition-dataset")
-        unzip_kaggle_data(loc) 
-        data = read_kaggle_data(loc) # read in csv file
-        engine = create_postgres_engine() #create engine
-        upload_datasets_to_db(data, engine=engine)
-        return True
-    except:
-        return False
-
-# cache data because the API call is not runtime - meaning pull only happens once
-@st.cache_data
-def pull_data_from_db():
-    """Download the data from the DB"""
-    engine = create_postgres_engine()
-    df = pull_data(engine)
-    X_train, X_test, y_train, y_test = preprocess_hr_data(df["wa_fn_usec__hr_employee_attrition"])
-    return X_train, X_test, y_train, y_test
 
 ## Cache so that it does not have to retrain model each render cycle
 @st.cache_resource
-def create_explainer(X_train, X_test, y_train, y_test):
-    """Create shap explainer so that we can analyze individual contributions of factors to Employee Attrition."""
-    model = create_classification_model_xgboost(X_train, y_train)
-    assert check_model(model,X_test, y_test) is True
-    return calculate_shap_values(model, pd.concat((X_train, X_test), axis = "index"))
+def get_explainer(url ="http://localhost:8010", table_name = "wa_fn_usec__hr_employee_attrition"):
+    """Get shap explainer from explainer_service so that we can visualize the contributions of factors to Employee Attrition."""
+    response = requests.post(url=url + f"/explain/{table_name}")
+    assert response.status_code == 200, "There is something wrong with the explainer service."
+    _explainer = pickle.loads(response.content)
+    return _explainer
 
 
 
 ##Generate figure - only create figures once.
 @st.cache_resource
-def create_fig(_explainer, X, mode = "Summary", id = 0):
+def create_fig(_explainer,  mode = "Summary", id = 0):
     """Creates figures for the frontend to showcase to the decision maker. Mode and id should not be exposed to a user, and should be handled dynamically inside the frontend.
     """
-    if _explainer is None or X is None:
-        return plt.figure(), ""
+    if _explainer is None:
+        return plt.figure(), "" # show nothing
     
     if mode == "Summary":
         desc ="""- Positive shapley value influences towards attrition
@@ -67,7 +51,9 @@ def create_fig(_explainer, X, mode = "Summary", id = 0):
                 - The thicker parts show the density of the data at a specific feature value range.
                 This analysis can help understand which factors play an important role in the model's decision for employee turnover. Generally speaking, High daily rate, balanced work/life, promotions, providing stocks, environment satisfaction can help retain employees according ot the model. 
                 """
-        shap.summary_plot(_explainer, X)
+        #shap.summary_plot(_explainer)
+        plt.figure()
+        shap.plots.beeswarm(_explainer, max_display=20)
         return plt.gcf(), desc
     elif mode == "Individual":
             desc = """This figure shows how a specific variable values influences the employee turnover. On the left hand side, the variable names also have values, which cause change in the output by the number shown in the bar. 
@@ -76,8 +62,8 @@ def create_fig(_explainer, X, mode = "Summary", id = 0):
             
             return plt.gcf(), desc
     
-    return plt.figure(), ""
-    
+    return plt.figure(), "" # otherwise show nothing.
+
 
 #%% Frontend features
 
@@ -85,30 +71,24 @@ with st.sidebar:
     st.title("Welcome to Employee attrition evaluation Dashboard!")
     st.text("The dashboard focuses employee attrition based on the IBM HR dataset. This analysis aims to provide answers to which factors contributed to employee turnover, and how significantly can one factor infuence the decision of the ML model. As you may know, employee turnover is very costly - companies have to retrain new employees, paying hiring fees and marketing, and effective time of the new employees will not be high in the first three months.")
     st.text("This dashboard pulls data from Kaggle, trains a classification model and creates Shapley-based explanation of variables's contribution to Employee Attrition")
-    st.text("For acquiring data, you must have a postgres DB already running in Docker, already configured.")
+    st.text("For acquiring data, you must have a postgres DB already running in Docker, already configured, Collector Service and Explaner Service running.")
     if st.button("Pull Data from kaggle"):
         if not api_call():
             st.text("API call was unsuccessful. Please check whether you have access token to Kaggle.")
         else:
-            X_train, X_test, y_train, y_test = pull_data_from_db()
-            st.session_state["data"] = pd.concat((X_train, X_test), axis="index")
-            st.session_state["data"].sort_index()
-            st.session_state['explainer'] = create_explainer(X_train, X_test, y_train, y_test )
+            st.text("API loaded data to DB.")
     
-    if st.button("Explain data!"):
+    if st.button("Get explanation!"):
         try:
-            X_train, X_test, y_train, y_test = pull_data_from_db()
-            st.session_state["data"] = pd.concat((X_train, X_test), axis="index")
-            st.session_state["data"].sort_index()
-            st.session_state['explainer'] = create_explainer(X_train, X_test, y_train, y_test )
+            st.session_state['explainer'] = get_explainer()
         except:
             st.text("Try pulling data first!")
             
     option = st.selectbox("Figure type", ["Summary", "Individual"], placeholder= "Please pull data from kaggle first.") 
-    if st.session_state["data"] is not None:
-        id = st.selectbox("Employee number (for individual analysis)", st.session_state["data"].index.tolist())   
+    if option == "Individual":
+        id = st.selectbox("Employee number (for individual analysis)", range(st.session_state['explainer'].shape[0]))   
 
 ### TODO: description on how to interpret
-fig, desc = create_fig(_explainer=st.session_state['explainer'], X = st.session_state["data"], mode = option, id = id)    
+fig, desc = create_fig(_explainer=st.session_state['explainer'], mode = option, id = id)    
 st.pyplot(fig)
 st.text(desc)

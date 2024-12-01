@@ -23,6 +23,8 @@ Dokumentálás. Kérünk, hogy a munkád alapszinten dokumentáld. Néhány szó
 ## Setup
 Fontos megjegyzés: a kódban mindenhol angolul kommentelek, kivéve a readme-ben. Ez csak megszokás.
 
+A feladattal kapcsolatban: Tudom hogy nagyon fontos manapság elkülöníteni a kódbázist. Sajnos ilyen apró problémáknál több rosszat tesznek mint ami jót (ugyanis az elemzés eléggé adatsor specifikus jelenleg), így a következőt javaslom: Legyen egy frontend app, amivel kezelhetőek a funkciók, és legyen egy adatbázis amivel kommunikálhatunk. Nem látom a hozzáadott értékét, ha külön Dockerrel futtatnám az elemzést. De amit lehet csinálni, hogy Docker image-ként python scriptet futtatom, egyes részekre, majd belerakom egy docker-composeba. Futtatásukat pedig egymástól függővé teszem. De ez sok időt vesz igénybe, így előbb inkább egy ereményt mutatnék.
+
 Python 3.12-őt használok.
 
 A githubon a main branchen található a működő kód. Ezt kérlek egy git clone-nal húzd le.
@@ -138,4 +140,4 @@ Ahol négy interaktálható elem van:
 
 Az ábrákat cache-elem, tehát nem kell egynél többször regenerálni, szintúgy a Shapley értékeket. A gombok funckionalítása is cachelve van, mert jelenleg nem változik a kaggle-n az adatsor. Természetesen ezt egy valós idejű rendszernél máshogy oldanám meg. Nem cache-lném ha külön microserviceben futtatnám és feltölteném a DB-be, majd onnan lekérném. Természetesen a modelt is el lehet menteni MLflow segítségével.
 
-Elnézést kérek, hogy lassú a frontend, gyorsan oldottam meg a feladatot, és a microservice architektúra neméppen a legoptimálisabb egy ilyen "kicsi" feladat megoldásához.
+Elnézést kérek, hogy lassú a frontend, gyorsan oldottam meg a feladatot, és a microservice architektúra neméppen a legoptimálisabb egy ilyen "kicsi" feladat megoldásához. Amin gondolkodtam, hogy külön service-ket készítek adatgyűjtésre, és a modellezésre, de sok időt vett volna el.
