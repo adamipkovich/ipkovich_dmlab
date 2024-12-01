@@ -36,7 +36,7 @@ def get_explainer(url ="http://localhost:8010", table_name = "wa_fn_usec__hr_emp
 
 ##Generate figure - only create figures once.
 @st.cache_resource
-def create_fig(_explainer,  mode = "Summary", id = 0):
+def create_fig(_explainer,  mode = None, id = 0):
     """Creates figures for the frontend to showcase to the decision maker. Mode and id should not be exposed to a user, and should be handled dynamically inside the frontend.
     """
     if _explainer is None:
@@ -46,14 +46,12 @@ def create_fig(_explainer,  mode = "Summary", id = 0):
         desc ="""- Positive shapley value influences towards attrition
                 - Grey values are categorical value
                 - Colors show feature value, x-axis shows the contribution towards attrition
-                - Features are ordered per importance
                 - This only describes the model. These are NOT causal results. The next step would be causal inference and experimental design to validate hypotheses.
                 - The thicker parts show the density of the data at a specific feature value range.
                 This analysis can help understand which factors play an important role in the model's decision for employee turnover. Generally speaking, High daily rate, low distance from home, providing stocks, high environment satisfaction, generally higher monthly income can help retain employees according to the model. 
                 """
-        #shap.summary_plot(_explainer)
-        plt.figure()
-        shap.plots.beeswarm(_explainer, max_display=20)
+        #fig, ax = plt.subplots()
+        shap.plots.beeswarm(_explainer, show = False)
         return plt.gcf(), desc
     elif mode == "Individual":
             desc = """This figure shows how a specific variable values influences the employee turnover. On the left hand side, the variable names also have values, which cause change in the output by the number shown in the bar. 
@@ -83,11 +81,14 @@ with st.sidebar:
             st.session_state['explainer'] = get_explainer()
         except:
             st.text("Try pulling data first!")
-            
-    option = st.selectbox("Figure type", ["Summary", "Individual"], placeholder= "Please pull data from kaggle first.") 
-    if option == "Individual":
-        id = st.selectbox("Employee number (for individual analysis)", range(st.session_state['explainer'].shape[0]))   
-
+    if  st.session_state['explainer'] is not None:
+        option = st.selectbox("Figure type", ["Summary", "Individual"])  # we need the placeholder, otherwise the summary plot is 
+        if option == "Individual":
+            id = st.selectbox("Employee number (for individual analysis)", range(st.session_state['explainer'].shape[0]))   
+        else:
+            id = None
+    else: 
+        option = None
 ### TODO: description on how to interpret
 fig, desc = create_fig(_explainer=st.session_state['explainer'], mode = option, id = id)    
 st.pyplot(fig)
