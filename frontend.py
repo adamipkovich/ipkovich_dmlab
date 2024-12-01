@@ -54,8 +54,6 @@ def create_explainer(X_train, X_test, y_train, y_test):
 @st.cache_resource
 def create_fig(_explainer, X, mode = "Summary", id = 0):
     """Creates figures for the frontend to showcase to the decision maker. Mode and id should not be exposed to a user, and should be handled dynamically inside the frontend.
-    
-    
     """
     if _explainer is None or X is None:
         return plt.figure(), ""

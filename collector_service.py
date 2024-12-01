@@ -34,7 +34,7 @@ def connect_to_db(request : Request):
     port = req.get("port")
     password = req.get("password")
     engine = create_postgres_engine(dbname=dbname, user=user, host=host, port=port, password=password)
-
+    
 @app.post("/pull")
 def get_kaggle_dataset(request : Request):  
     global engine ## Errors from
