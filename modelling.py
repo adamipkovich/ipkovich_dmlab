@@ -86,5 +86,11 @@ def calculate_shap_values(model, X)-> shap.Explanation:
 if __name__ == "__main__":
     
     engine = create_postgres_engine()
-    data = pull_data(engine)
+    df = pull_data(engine, table_name="wa_fn_usec__hr_employee_attrition")
+    X_train, X_test, y_train, y_test = preprocess_hr_data(df) ## will not work with other than "wa_fn_usec__hr_employee_attrition"
+    model = create_classification_model_xgboost(X_train, y_train)
+    ##TODO save/export model -- MLFLOW service... 
+    assert check_model(model,X_test, y_test) is True
+    explainer = calculate_shap_values(model, pd.concat((X_train, X_test), axis = "index"))## do explanation, 
+    shap.summary_plot(explainer)
     

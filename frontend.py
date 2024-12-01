@@ -72,7 +72,7 @@ with st.sidebar:
     st.text("The dashboard focuses employee attrition based on the IBM HR dataset. This analysis aims to provide answers to which factors contributed to employee turnover, and how significantly can one factor infuence the decision of the ML model. As you may know, employee turnover is very costly - companies have to retrain new employees, paying hiring fees and marketing, and effective time of the new employees will not be high in the first three months.")
     st.text("This dashboard pulls data from Kaggle, trains a xgboost classification model and creates Shapley-based explanation of variables' contribution to Employee Attrition")
     st.text("This interface requires a postgres DB already running in Docker, already configured, Collector Service and Explainer Service running.")
-    if st.button("Pull Data from kaggle"):
+    if st.button("Pull Data from kaggle!"):
         if not api_call():
             st.text("API call was unsuccessful. Please check whether you have access token to Kaggle.")
         else:
