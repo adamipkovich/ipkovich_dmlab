@@ -21,8 +21,8 @@ Dokumentálás. Kérünk, hogy a munkád alapszinten dokumentáld. Néhány szó
 # Megoldás
 
 ## Setup
-
-Python 3.12-vel dolgozom. [ITT](https://www.python.org/downloads/release/python-3127/) letöltheted.
+ 
+Python 3.12-vel dolgozom. [ITT](https://www.python.org/downloads/release/python-3127/) letöltheted. Vscode-ban dolgozom, a service-ket külön terminálban futtatom, a DB-n kívűl amit [docker](https://www.docker.com/)en keresztül futtatok.
 A githubon a main branchen található a működő kód. Ezt kérlek egy git clone-nal húzd le.
 A projekt lokálisan futtatható, felállítottam egy poetry környezetet, hogy könnyen telepíthető legyen az összes csomag. Ez azért is fontos, hogy Ti is ugyanolyan verziójú csomagokat használjatok.
 
@@ -30,8 +30,7 @@ A projekt lokálisan futtatható, felállítottam egy poetry környezetet, hogy 
 poetry install
 ```
 
-A rendszer egy postgresql adatbázist, 2 microservice API-t és egy frontendnet tartalmaz.
-
+A rendszer egy postgresql adatbázist, 2 microservice API-t és egy frontendnet tartalmaz és IBM HR adatbázisát dolgozza fel.
 
 ## Adattárolás
 
@@ -100,6 +99,10 @@ A [Collector Service](collector_service.py)-t egy uvicorn szerverrel futtatott F
 Tesztelni a microservice-t a [request_collection.py](request_collection.py)-vel lehet. Ez tulajdonképpen ugyan azt csinálja, mint a data_request, de requests könyvtárral, URL alapú post requestet kér a collector servicetől, hogy töltse fel az adatot az adatbázisba. Ezt a "/pull" post paranccsal tehetjük meg.
 A szerver localhost 8015-ös portjára van konfigurálva. 
 
+A futtatáshoz:
+```commandline
+python collector_service.py
+```
 
 ## Modelling
 
@@ -126,6 +129,11 @@ Ha ez nem fut le, valószínű nincs a DB-ben az adattábla.
 
 Az uvicorn szerver localhost 8010-ös portjára van konfigurálva. 
 
+A futtatáshoz:
+```commandline
+python explainer_service.py
+```
+
 ## Frontend
 
 Frontendnek a Streamlit-et választottam mert egyszerű dashboardot készíteni vele. Technikailag jobb lenne ha építenék egy FastAPI backendet modelltanításra, mlflow-t MLOPS-ra és VC-ra, de az nem fér bele az allokált időbe. Korrelációs mátrixot a draftban vizsgálok, de a dashboardba már nem került bele.
@@ -147,3 +155,9 @@ Ahol négy interaktálható elem van:
 - Employee number __selectbox__ : Csak a minták (figure type "Individual" opció) vizsgálatánál releváns. ID alapján kiválasztunk egy munkavállalót, és őt magyarázzuk.
 
 Az ábrákat cache-elem, tehát nem kell egynél többször regenerálni. Elnézést kérek, hogy ha lassú a frontend, gyorsan oldottam meg a feladatot, és a microservice architektúra neméppen a legoptimálisabb egy ilyen "kicsi" feladat megoldásához.
+
+
+## Docker
+
+Sajnos erre nincs időm, de a kódokatúgy írtam meg, hogy Docker-rel és Docker Compose-zal egy teljes értékű applikáció készülhessen belőle. Ezért van a két service-nél globális változóban a postgresql credential. A frontendnél külön még be kell rakni a két service elérhetőségét egy állapotváltozóba, amelyet szintúgy egy globális változóként kezelhetünk.
+
