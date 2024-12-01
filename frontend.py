@@ -49,7 +49,7 @@ def create_fig(_explainer,  mode = "Summary", id = 0):
                 - Features are ordered per importance
                 - This only describes the model. These are NOT causal results. The next step would be causal inference and experimental design to validate hypotheses.
                 - The thicker parts show the density of the data at a specific feature value range.
-                This analysis can help understand which factors play an important role in the model's decision for employee turnover. Generally speaking, High daily rate, balanced work/life, promotions, providing stocks, environment satisfaction can help retain employees according ot the model. 
+                This analysis can help understand which factors play an important role in the model's decision for employee turnover. Generally speaking, High daily rate, low distance from home, providing stocks, high environment satisfaction, generally higher monthly income can help retain employees according to the model. 
                 """
         #shap.summary_plot(_explainer)
         plt.figure()
@@ -70,8 +70,8 @@ def create_fig(_explainer,  mode = "Summary", id = 0):
 with st.sidebar:
     st.title("Welcome to Employee attrition evaluation Dashboard!")
     st.text("The dashboard focuses employee attrition based on the IBM HR dataset. This analysis aims to provide answers to which factors contributed to employee turnover, and how significantly can one factor infuence the decision of the ML model. As you may know, employee turnover is very costly - companies have to retrain new employees, paying hiring fees and marketing, and effective time of the new employees will not be high in the first three months.")
-    st.text("This dashboard pulls data from Kaggle, trains a classification model and creates Shapley-based explanation of variables's contribution to Employee Attrition")
-    st.text("For acquiring data, you must have a postgres DB already running in Docker, already configured, Collector Service and Explaner Service running.")
+    st.text("This dashboard pulls data from Kaggle, trains a xgboost classification model and creates Shapley-based explanation of variables' contribution to Employee Attrition")
+    st.text("This interface requires a postgres DB already running in Docker, already configured, Collector Service and Explainer Service running.")
     if st.button("Pull Data from kaggle"):
         if not api_call():
             st.text("API call was unsuccessful. Please check whether you have access token to Kaggle.")
