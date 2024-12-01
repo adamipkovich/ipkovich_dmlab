@@ -11,8 +11,8 @@ engine = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Load the ML model
-    ## set global variables
+    """Connect to the DB on startup."""
+    ## get global variables -> Docker may be used to define credentials
     global engine
     dbname = os.environ["DBNAME"]
     user = os.environ["DBUSER"]
@@ -27,10 +27,12 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def landing():
+    """API to check which service is opened on this port."""
     return "Welcome to the IMB HR explainer service! This only works with wa_fn_usec__hr_employee_attrition, yet!"
 
 @app.post("/connect")
 def connect_to_db(request : Request):
+    """Use if you could not join to the DB on runtime"""
     global engine
     req = dict(request.query_params)
     dbname = req.get("dbname")
@@ -42,6 +44,7 @@ def connect_to_db(request : Request):
 
 @app.post("/explain/{table_name}")
 def explain(table_name : str):
+    """Pull table 'table_name' from DB, preprocess data, train model and return an Explainer object pickler as a FileResponse."""
     global engine
     
     df = pull_data(engine, table_name=table_name)
