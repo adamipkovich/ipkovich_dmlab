@@ -162,6 +162,3 @@ Az ábrákat cache-elem, tehát nem kell egynél többször regenerálni. Elnéz
 
 Sajnos erre nincs időm, de a kódokatúgy írtam meg, hogy Docker-rel és Docker Compose-zal egy teljes értékű applikáció készülhessen belőle. Ezért van a két service-nél globális változóban a postgresql credential. A frontendnél külön még be kell rakni a két service elérhetőségét egy állapotváltozóba, amelyet szintúgy egy globális változóként kezelhetünk.
 
-## BUG
-
-Potenciális bug: Sajnos a SHAP nem kezeli valami jól az ábrákat, ezért amikor lekérem, a summary-plotnál előfordulhat, hogy nem adja vissza az ábrát, csak egy fehér üres téglalapot. Az munkavállaókat viszont már képes magyarázni.
