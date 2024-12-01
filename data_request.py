@@ -45,15 +45,11 @@ def upload_datasets_to_db(data : dict[str, pd.DataFrame], engine : Engine) -> No
     for k in data:
         data[k].to_sql(name=k, con = engine, if_exists ="replace")
 
-def pull_data(engine : Engine, table_name : str = None) -> dict:
-    data = dict()
+def pull_data(engine : Engine, table_name : str = None) -> pd.DataFrame:
+    """Returns a table from the DB."""
     with engine.connect() as connection:
-        ##get all table
-        inspector = inspect(engine)
-        for k in inspector.get_table_names():
-            data[k] = pd.read_sql(f'SELECT * FROM public."{k}"', con=connection)
-            data[k].set_index("index", inplace=True)
-            #connection.execute(text(f'SELECT * FROM public."{k}"')).fetchall()
+        data = pd.read_sql(f'SELECT * FROM public."{table_name}"', con=connection)
+        data.set_index("index", inplace=True)
     return data
 
 ## Test
